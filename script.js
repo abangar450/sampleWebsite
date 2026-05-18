@@ -7,6 +7,22 @@ const channelSeries = [
   { label: "Partners", value: 36, color: "#5e6e8f" }
 ];
 
+const authConfig = window.AUTH_CONFIG || {};
+const allowedDomain = (authConfig.allowedDomain || "caprw.org").toLowerCase();
+const googleClientId = authConfig.googleClientId || "";
+const sessionStorageKey = "signalDeckSession";
+
+const authOverlay = document.getElementById("authOverlay");
+const authStatus = document.getElementById("authStatus");
+const authDomain = document.getElementById("authDomain");
+const dashboardShell = document.getElementById("dashboardShell");
+const googleSignInButton = document.getElementById("googleSignInButton");
+const userSession = document.getElementById("userSession");
+const userAvatar = document.getElementById("userAvatar");
+const userName = document.getElementById("userName");
+const userEmail = document.getElementById("userEmail");
+const signOutButton = document.getElementById("signOutButton");
+
 function setCurrentDate() {
   const dateTarget = document.getElementById("currentDate");
   if (!dateTarget) {
@@ -20,6 +36,274 @@ function setCurrentDate() {
   }).format(new Date());
 
   dateTarget.textContent = formattedDate;
+}
+
+function setAuthStatus(message, state) {
+  if (!authStatus) {
+    return;
+  }
+
+  authStatus.textContent = message;
+
+  if (state) {
+    authStatus.dataset.state = state;
+    return;
+  }
+
+  delete authStatus.dataset.state;
+}
+
+function setDashboardLocked(isLocked) {
+  document.body.classList.toggle("auth-locked", isLocked);
+
+  if (!dashboardShell) {
+    return;
+  }
+
+  if (isLocked) {
+    dashboardShell.setAttribute("inert", "");
+    dashboardShell.setAttribute("aria-hidden", "true");
+    authOverlay?.removeAttribute("hidden");
+    return;
+  }
+
+  dashboardShell.removeAttribute("inert");
+  dashboardShell.setAttribute("aria-hidden", "false");
+  authOverlay?.setAttribute("hidden", "");
+}
+
+function getInitials(name) {
+  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return "C";
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+}
+
+function updateUserSession(profile) {
+  if (!userSession || !userAvatar || !userName || !userEmail) {
+    return;
+  }
+
+  userAvatar.textContent = getInitials(profile.name);
+  userName.textContent = profile.name;
+  userEmail.textContent = profile.email;
+  userSession.hidden = false;
+}
+
+function clearUserSession() {
+  if (!userSession || !userAvatar || !userName || !userEmail) {
+    return;
+  }
+
+  userAvatar.textContent = "C";
+  userName.textContent = "CAPRW User";
+  userEmail.textContent = `user@${allowedDomain}`;
+  userSession.hidden = true;
+}
+
+function saveSession(profile) {
+  window.sessionStorage.setItem(sessionStorageKey, JSON.stringify(profile));
+}
+
+function loadSession() {
+  const savedValue = window.sessionStorage.getItem(sessionStorageKey);
+  if (!savedValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(savedValue);
+  } catch (error) {
+    window.sessionStorage.removeItem(sessionStorageKey);
+    return null;
+  }
+}
+
+function clearSession() {
+  window.sessionStorage.removeItem(sessionStorageKey);
+}
+
+function decodeJwtPayload(token) {
+  try {
+    const payload = token.split(".")[1];
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    const json = decodeURIComponent(
+      Array.from(decoded, (character) => {
+        return `%${character.charCodeAt(0).toString(16).padStart(2, "0")}`;
+      }).join("")
+    );
+    return JSON.parse(json);
+  } catch (error) {
+    return null;
+  }
+}
+
+function isAllowedProfile(profile) {
+  if (!profile) {
+    return false;
+  }
+
+  const normalizedEmail = String(profile.email || "").toLowerCase();
+  const hostedDomain = String(profile.hd || "").toLowerCase();
+  const isVerified = profile.email_verified === true || profile.email_verified === "true";
+
+  return (
+    isVerified &&
+    hostedDomain === allowedDomain &&
+    normalizedEmail.endsWith(`@${allowedDomain}`)
+  );
+}
+
+function unlockDashboard(profile) {
+  updateUserSession(profile);
+  setDashboardLocked(false);
+  setAuthStatus(`Signed in as ${profile.email}.`, "success");
+}
+
+function lockDashboard(message, state) {
+  clearUserSession();
+  setDashboardLocked(true);
+  setAuthStatus(message, state);
+}
+
+function handleGoogleCredentialResponse(response) {
+  const payload = decodeJwtPayload(response.credential || "");
+
+  if (!isAllowedProfile(payload)) {
+    clearSession();
+    lockDashboard(
+      `Access denied. Sign in with an email address on the ${allowedDomain} Google Workspace domain.`,
+      "error"
+    );
+    return;
+  }
+
+  const profile = {
+    email: payload.email,
+    hd: payload.hd,
+    name: payload.name || payload.email,
+    picture: payload.picture || "",
+    email_verified: payload.email_verified
+  };
+
+  saveSession(profile);
+  unlockDashboard(profile);
+}
+
+function initializeGoogleSignIn() {
+  if (!googleSignInButton) {
+    return;
+  }
+
+  if (!googleClientId || googleClientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
+    lockDashboard(
+      "Google SSO is not configured yet. Add your Google OAuth client ID in auth-config.js to enable sign-in.",
+      "error"
+    );
+    return;
+  }
+
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+    lockDashboard(
+      "Google Sign-In could not be loaded. Refresh the page after verifying network access to Google Identity Services.",
+      "error"
+    );
+    return;
+  }
+
+  google.accounts.id.initialize({
+    client_id: googleClientId,
+    callback: handleGoogleCredentialResponse,
+    ux_mode: "popup",
+    auto_select: false,
+    cancel_on_tap_outside: false,
+    context: "signin",
+    hd: allowedDomain
+  });
+
+  google.accounts.id.renderButton(googleSignInButton, {
+    type: "standard",
+    theme: "outline",
+    text: "continue_with",
+    shape: "pill",
+    size: "large",
+    width: 320,
+    logo_alignment: "left"
+  });
+
+  setAuthStatus(`Sign in with your ${allowedDomain} Google account to continue.`, "");
+}
+
+function waitForGoogleIdentityServices(attempt) {
+  if (window.google && window.google.accounts && window.google.accounts.id) {
+    initializeGoogleSignIn();
+    return;
+  }
+
+  if (attempt >= 40) {
+    if (document.body.classList.contains("auth-locked")) {
+      lockDashboard(
+        "Google Sign-In did not finish loading. Refresh the page and try again.",
+        "error"
+      );
+    }
+    return;
+  }
+
+  window.setTimeout(() => {
+    waitForGoogleIdentityServices(attempt + 1);
+  }, 250);
+}
+
+function restoreSavedSession() {
+  const savedSession = loadSession();
+  if (!isAllowedProfile(savedSession)) {
+    clearSession();
+    clearUserSession();
+    return false;
+  }
+
+  unlockDashboard(savedSession);
+  return true;
+}
+
+function signOut() {
+  clearSession();
+  clearUserSession();
+
+  if (window.google && window.google.accounts && window.google.accounts.id) {
+    google.accounts.id.disableAutoSelect();
+  }
+
+  lockDashboard(`Signed out. Sign back in with your ${allowedDomain} Google account.`, "");
+}
+
+function setupAuth() {
+  const restored = restoreSavedSession();
+  const hasConfiguredClientId = Boolean(
+    googleClientId && !googleClientId.includes("YOUR_GOOGLE_CLIENT_ID")
+  );
+
+  if (authDomain) {
+    authDomain.textContent = allowedDomain;
+  }
+
+  if (!hasConfiguredClientId) {
+    if (!restored) {
+      initializeGoogleSignIn();
+    }
+  } else {
+    waitForGoogleIdentityServices(0);
+  }
+
+  signOutButton?.addEventListener("click", signOut);
 }
 
 function animateCounters() {
@@ -205,6 +489,7 @@ function buildChannelChart() {
 }
 
 setCurrentDate();
+setupAuth();
 animateCounters();
 buildRevenueChart();
 buildChannelChart();

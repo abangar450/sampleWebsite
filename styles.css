@@ -39,11 +39,19 @@ body {
     linear-gradient(135deg, #eef6fb 0%, #f7f3ea 45%, #fff8f0 100%);
 }
 
+body.auth-locked {
+  overflow: hidden;
+}
+
 button,
 a,
 table,
 input {
   font: inherit;
+}
+
+button {
+  border: 0;
 }
 
 .page-backdrop {
@@ -108,6 +116,15 @@ input {
   width: min(1440px, calc(100% - 32px));
   margin: 16px auto;
   padding: 16px;
+  transition: filter 220ms ease, transform 220ms ease, opacity 220ms ease;
+}
+
+body.auth-locked .dashboard-shell {
+  filter: blur(16px) saturate(0.86);
+  transform: scale(0.988);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
 }
 
 .sidebar,
@@ -115,6 +132,100 @@ input {
   border: 1px solid rgba(255, 255, 255, 0.56);
   backdrop-filter: blur(24px);
   box-shadow: var(--shadow);
+}
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 24, 39, 0.2);
+  backdrop-filter: blur(18px);
+}
+
+.auth-overlay[hidden] {
+  display: none;
+}
+
+.auth-card {
+  width: min(520px, 100%);
+  padding: 30px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  background:
+    radial-gradient(circle at top right, rgba(31, 138, 138, 0.18), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 252, 247, 0.92));
+  box-shadow: 0 26px 90px rgba(14, 23, 38, 0.2);
+}
+
+.auth-eyebrow {
+  color: var(--teal);
+}
+
+.auth-card h2 {
+  margin: 8px 0 12px;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-family: "Bahnschrift", "Aptos Display", "Franklin Gothic Medium", sans-serif;
+  color: var(--navy);
+}
+
+.auth-copy {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--muted-strong);
+  line-height: 1.65;
+}
+
+.auth-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 20px;
+}
+
+.auth-badge {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  font-size: 0.8rem;
+  color: var(--navy);
+}
+
+.google-signin-slot {
+  min-height: 44px;
+}
+
+.auth-status,
+.auth-footnote {
+  margin: 14px 0 0;
+  line-height: 1.6;
+}
+
+.auth-status {
+  color: var(--muted-strong);
+}
+
+.auth-status[data-state="error"] {
+  color: #9a2f22;
+}
+
+.auth-status[data-state="success"] {
+  color: #0e6967;
+}
+
+.auth-footnote {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.auth-footnote code {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.06);
+  color: var(--navy);
 }
 
 .sidebar {
@@ -286,6 +397,47 @@ input {
   gap: 12px;
 }
 
+.user-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(23, 32, 51, 0.08);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--teal), #57a9b0);
+  color: white;
+  font-weight: 700;
+}
+
+.user-meta {
+  display: grid;
+}
+
+.user-meta strong {
+  color: var(--navy);
+  font-size: 0.92rem;
+}
+
+.user-meta span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 .date-chip,
 .chart-pill {
   padding: 10px 14px;
@@ -307,7 +459,6 @@ input {
 }
 
 .primary-button {
-  border: 0;
   border-radius: 999px;
   padding: 14px 20px;
   color: white;
@@ -321,6 +472,22 @@ input {
 .primary-button:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 18px 34px rgba(30, 54, 93, 0.28);
+}
+
+.ghost-button {
+  padding: 12px 16px;
+  border-radius: 999px;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  cursor: pointer;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.ghost-button:hover,
+.ghost-button:focus-visible {
+  background: rgba(255, 255, 255, 0.96);
+  transform: translateY(-1px);
 }
 
 .hero-grid {
@@ -726,6 +893,10 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .auth-card {
+    padding: 26px;
+  }
+
   .sidebar {
     gap: 18px;
   }
@@ -778,6 +949,16 @@ td {
     align-items: stretch;
   }
 
+  .user-session {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-chip {
+    border-radius: 20px;
+  }
+
   .hero-highlights,
   .metrics-grid {
     grid-template-columns: 1fr;
@@ -795,6 +976,15 @@ td {
   th,
   td {
     padding-inline: 10px;
+  }
+
+  .auth-overlay {
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 24px 20px;
+    border-radius: 24px;
   }
 }
 

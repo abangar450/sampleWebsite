@@ -6,7 +6,7 @@
   <title>Signal Deck Dashboard</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="auth-locked">
   <div class="page-backdrop" aria-hidden="true">
     <div class="orb orb-one"></div>
     <div class="orb orb-two"></div>
@@ -14,7 +14,32 @@
     <div class="grid-glow"></div>
   </div>
 
-  <div class="dashboard-shell">
+  <div class="auth-overlay" id="authOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <section class="auth-card">
+      <p class="eyebrow auth-eyebrow">Protected workspace</p>
+      <h2 id="loginTitle">Sign in to view Signal Deck</h2>
+      <p class="auth-copy">
+        Continue with Google SSO using your CAPRW account. Access is limited to the
+        <strong id="authDomain">caprw.org</strong> domain.
+      </p>
+
+      <div class="auth-badge-row" aria-hidden="true">
+        <span class="auth-badge">Google SSO</span>
+        <span class="auth-badge">CAPRW only</span>
+        <span class="auth-badge">Dashboard access</span>
+      </div>
+
+      <div class="google-signin-slot" id="googleSignInButton"></div>
+      <p class="auth-status" id="authStatus" aria-live="polite">
+        Sign in with your CAPRW Google account to continue.
+      </p>
+      <p class="auth-footnote">
+        Configure your Google OAuth client ID in <code>auth-config.js</code> before going live.
+      </p>
+    </section>
+  </div>
+
+  <div class="dashboard-shell" id="dashboardShell" aria-hidden="true">
     <aside class="sidebar">
       <div class="brand-lockup">
         <div class="brand-mark">S</div>
@@ -75,6 +100,16 @@
             <span>Updated</span>
             <strong id="currentDate">May 18, 2026</strong>
           </div>
+          <div class="user-session" id="userSession" hidden>
+            <div class="user-chip">
+              <div class="user-avatar" id="userAvatar">C</div>
+              <div class="user-meta">
+                <strong id="userName">CAPRW User</strong>
+                <span id="userEmail">user@caprw.org</span>
+              </div>
+            </div>
+            <button class="ghost-button" id="signOutButton" type="button">Sign out</button>
+          </div>
           <button class="primary-button" type="button">Export report</button>
         </div>
       </header>
@@ -133,7 +168,7 @@
           </div>
 
           <div class="agenda-card">
-            <p class="card-label">Today’s focus</p>
+            <p class="card-label">Today's focus</p>
             <ul class="agenda-list">
               <li>
                 <strong>Refine budget allocation</strong>
@@ -316,6 +351,8 @@
     </main>
   </div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="auth-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
