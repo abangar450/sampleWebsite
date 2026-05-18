@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Deck Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-backdrop" aria-hidden="true">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
+    <div class="grid-glow"></div>
+  </div>
+
+  <div class="dashboard-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark">S</div>
+        <div>
+          <p class="eyebrow">Insight workspace</p>
+          <h1>Signal Deck</h1>
+        </div>
+      </div>
+
+      <p class="sidebar-copy">
+        A sample analytics environment designed for operations, growth, and forecasting teams.
+      </p>
+
+      <nav class="sidebar-nav" aria-label="Primary">
+        <a class="nav-item active" href="#overview">
+          <span>Overview</span>
+          <small>Executive summary</small>
+        </a>
+        <a class="nav-item" href="#performance">
+          <span>Performance</span>
+          <small>Trend tracking</small>
+        </a>
+        <a class="nav-item" href="#channels">
+          <span>Channels</span>
+          <small>Campaign mix</small>
+        </a>
+        <a class="nav-item" href="#pipeline">
+          <span>Pipeline</span>
+          <small>Conversion flow</small>
+        </a>
+      </nav>
+
+      <section class="sidebar-card">
+        <p class="card-label">Snapshot</p>
+        <h2>92%</h2>
+        <p class="sidebar-stat">Team utilization is pacing ahead of the monthly plan.</p>
+        <div class="mini-grid">
+          <div>
+            <span>Alerts</span>
+            <strong>03</strong>
+          </div>
+          <div>
+            <span>Risks</span>
+            <strong>01</strong>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Live dashboard</p>
+          <h2 id="overview">Growth command center</h2>
+        </div>
+        <div class="topbar-actions">
+          <div class="date-chip">
+            <span>Updated</span>
+            <strong id="currentDate">May 18, 2026</strong>
+          </div>
+          <button class="primary-button" type="button">Export report</button>
+        </div>
+      </header>
+
+      <section class="hero-grid">
+        <article class="hero-card">
+          <div class="hero-copy">
+            <p class="card-label">Quarter-to-date</p>
+            <h3>$4.28M booked revenue</h3>
+            <p>
+              Revenue is up 18.4% quarter-over-quarter, led by stronger conversion in referral and paid social segments.
+            </p>
+          </div>
+
+          <div class="hero-highlights">
+            <div>
+              <span>Target attainment</span>
+              <strong>86%</strong>
+            </div>
+            <div>
+              <span>Forecast accuracy</span>
+              <strong>97.2%</strong>
+            </div>
+            <div>
+              <span>Net retention</span>
+              <strong>121%</strong>
+            </div>
+          </div>
+
+          <div class="hero-chart-wrap" aria-label="Revenue trend chart">
+            <div class="chart-head">
+              <div>
+                <span class="chart-kicker">Revenue trend</span>
+                <h4>12-week trajectory</h4>
+              </div>
+              <span class="chart-pill positive">+12.8% vs. last period</span>
+            </div>
+            <svg id="revenueChart" class="chart-surface" viewBox="0 0 560 240" role="img" aria-labelledby="revenueTitle">
+              <title id="revenueTitle">Revenue trend over 12 weeks</title>
+            </svg>
+          </div>
+        </article>
+
+        <article class="focus-card">
+          <div class="ring-card">
+            <p class="card-label">Completion score</p>
+            <div class="progress-ring" style="--progress: 78">
+              <div class="ring-center">
+                <strong>78%</strong>
+                <span>On track</span>
+              </div>
+            </div>
+            <p class="ring-copy">
+              Most initiatives are healthy. Pipeline speed is the biggest opportunity heading into next month.
+            </p>
+          </div>
+
+          <div class="agenda-card">
+            <p class="card-label">Today’s focus</p>
+            <ul class="agenda-list">
+              <li>
+                <strong>Refine budget allocation</strong>
+                <span>Shift 8% from display into referral.</span>
+              </li>
+              <li>
+                <strong>Reduce drop-off at demo stage</strong>
+                <span>Follow-up cadence lagging by 14 hours.</span>
+              </li>
+              <li>
+                <strong>Expand enterprise sequence</strong>
+                <span>High-intent accounts grew 11% this week.</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+      <section class="metrics-grid" aria-label="Key performance indicators">
+        <article class="metric-card accent-teal">
+          <p class="card-label">Active users</p>
+          <h3 class="counter" data-value="48210">0</h3>
+          <p>Monthly product actives with a <strong>9.6%</strong> lift.</p>
+        </article>
+        <article class="metric-card accent-coral">
+          <p class="card-label">Conversion rate</p>
+          <h3 class="counter" data-value="6.8" data-suffix="%">0</h3>
+          <p>Improved by <strong>1.4 pts</strong> after the onboarding refresh.</p>
+        </article>
+        <article class="metric-card accent-gold">
+          <p class="card-label">Avg. deal cycle</p>
+          <h3 class="counter" data-value="23" data-suffix="d">0</h3>
+          <p>Enterprise cycle time shortened by <strong>5 days</strong>.</p>
+        </article>
+        <article class="metric-card accent-ink">
+          <p class="card-label">Support SLA</p>
+          <h3 class="counter" data-value="98.7" data-suffix="%">0</h3>
+          <p>Response performance remains above the team target.</p>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel-card wide-card" id="performance">
+          <div class="panel-head">
+            <div>
+              <p class="card-label">Performance mix</p>
+              <h3>Channel contribution</h3>
+            </div>
+            <span class="chart-pill neutral">Updated every 15 min</span>
+          </div>
+          <svg id="channelChart" class="chart-surface mix-chart" viewBox="0 0 560 280" role="img" aria-labelledby="channelTitle">
+            <title id="channelTitle">Channel contribution chart</title>
+          </svg>
+        </article>
+
+        <article class="panel-card" id="pipeline">
+          <div class="panel-head">
+            <div>
+              <p class="card-label">Pipeline health</p>
+              <h3>Funnel stages</h3>
+            </div>
+          </div>
+          <div class="funnel-list">
+            <div class="funnel-row">
+              <span>Leads</span>
+              <div class="funnel-bar"><span style="width: 92%"></span></div>
+              <strong>11.4k</strong>
+            </div>
+            <div class="funnel-row">
+              <span>MQL</span>
+              <div class="funnel-bar"><span style="width: 70%"></span></div>
+              <strong>8.1k</strong>
+            </div>
+            <div class="funnel-row">
+              <span>SQL</span>
+              <div class="funnel-bar"><span style="width: 51%"></span></div>
+              <strong>5.3k</strong>
+            </div>
+            <div class="funnel-row">
+              <span>Demo</span>
+              <div class="funnel-bar"><span style="width: 34%"></span></div>
+              <strong>3.4k</strong>
+            </div>
+            <div class="funnel-row">
+              <span>Closed</span>
+              <div class="funnel-bar"><span style="width: 18%"></span></div>
+              <strong>1.8k</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel-card" id="channels">
+          <div class="panel-head">
+            <div>
+              <p class="card-label">Team pulse</p>
+              <h3>Recent activity</h3>
+            </div>
+          </div>
+          <ul class="activity-list">
+            <li>
+              <span class="activity-dot teal"></span>
+              <div>
+                <strong>Forecast revised</strong>
+                <p>North region forecast increased by $210k.</p>
+              </div>
+              <time>09:14</time>
+            </li>
+            <li>
+              <span class="activity-dot coral"></span>
+              <div>
+                <strong>Campaign launched</strong>
+                <p>Referral nurture sequence is now live.</p>
+              </div>
+              <time>10:02</time>
+            </li>
+            <li>
+              <span class="activity-dot gold"></span>
+              <div>
+                <strong>SLA warning cleared</strong>
+                <p>Backlog normalized after staffing change.</p>
+              </div>
+              <time>11:27</time>
+            </li>
+          </ul>
+        </article>
+
+        <article class="panel-card full-width">
+          <div class="panel-head">
+            <div>
+              <p class="card-label">Account portfolio</p>
+              <h3>Top opportunities</h3>
+            </div>
+            <span class="chart-pill positive">19 accounts above target</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Segment</th>
+                  <th>Probability</th>
+                  <th>Value</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Northwind Labs</td>
+                  <td>Enterprise</td>
+                  <td><span class="status-tag warm">81%</span></td>
+                  <td>$420k</td>
+                  <td>A. Brooks</td>
+                </tr>
+                <tr>
+                  <td>Harbor Health</td>
+                  <td>Mid-market</td>
+                  <td><span class="status-tag cool">73%</span></td>
+                  <td>$190k</td>
+                  <td>J. Singh</td>
+                </tr>
+                <tr>
+                  <td>Atlas Works</td>
+                  <td>Enterprise</td>
+                  <td><span class="status-tag warm">88%</span></td>
+                  <td>$560k</td>
+                  <td>L. Chen</td>
+                </tr>
+                <tr>
+                  <td>Summit Grid</td>
+                  <td>SMB</td>
+                  <td><span class="status-tag neutral">64%</span></td>
+                  <td>$72k</td>
+                  <td>M. Rivera</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
